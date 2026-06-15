@@ -524,3 +524,59 @@
   color: inherit;
 }
 
+/* Top-Left Corner Resize Handle */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  cursor: nwse-resize;
+  z-index: 1900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sage-light);
+  opacity: 0.5;
+  transition: var(--transition-fast);
+}
+
+.resize-handle:hover {
+  opacity: 1;
+  color: #ffffff;
+}
+
+.resize-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Force message bubble to utilize full width if it contains a table */
+.message-bubble:has(.table-responsive) {
+  width: 100%;
+  max-width: 100%;
+}
+
+.msg-content-col:has(.table-responsive) {
+  max-width: 100%;
+}
+
+/* Table column sizing and text wrap rules */
+.chat-table th:nth-child(1),
+.chat-table td:nth-child(1) {
+  width: 35%;
+  font-weight: 600;
+}
+
+.chat-table th:nth-child(2),
+.chat-table td:nth-child(2) {
+  width: 20%;
+  white-space: nowrap;
+}
+
+.chat-table th:nth-child(3),
+.chat-table td:nth-child(3) {
+  width: 45%;
+}
+
+

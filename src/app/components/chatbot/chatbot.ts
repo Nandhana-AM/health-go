@@ -22,6 +22,53 @@ export class ChatbotComponent {
 
   // Toggle State
   readonly isOpen = signal<boolean>(false);
+
+  // Drag-Resizing State
+  private isResizing = false;
+  private startX = 0;
+  private startY = 0;
+  private startWidth = 0;
+  private startHeight = 0;
+  
+  readonly chatWidth = signal<string>('380px');
+  readonly chatHeight = signal<string>('520px');
+
+  startResizing(event: MouseEvent): void {
+    event.preventDefault();
+    this.isResizing = true;
+    this.startX = event.clientX;
+    this.startY = event.clientY;
+    
+    if (this.chatScrollContainer) {
+      const panel = this.chatScrollContainer.nativeElement.closest('.chat-window-panel') as HTMLElement;
+      if (panel) {
+        this.startWidth = panel.offsetWidth;
+        this.startHeight = panel.offsetHeight;
+      }
+    }
+    
+    window.addEventListener('mousemove', this.onResizing);
+    window.addEventListener('mouseup', this.stopResizing);
+  }
+
+  private onResizing = (event: MouseEvent) => {
+    if (!this.isResizing) return;
+    const dx = this.startX - event.clientX;
+    const dy = this.startY - event.clientY;
+    
+    // Limits: min 320x400, max is the screen boundaries
+    const newWidth = Math.max(320, Math.min(window.innerWidth - 60, this.startWidth + dx));
+    const newHeight = Math.max(400, Math.min(window.innerHeight - 120, this.startHeight + dy));
+    
+    this.chatWidth.set(`${newWidth}px`);
+    this.chatHeight.set(`${newHeight}px`);
+  };
+
+  private stopResizing = () => {
+    this.isResizing = false;
+    window.removeEventListener('mousemove', this.onResizing);
+    window.removeEventListener('mouseup', this.stopResizing);
+  };
   
   // Message Log
   readonly messages = signal<ChatMessage[]>([
@@ -103,6 +150,9 @@ export class ChatbotComponent {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
+
+    // 1b. Restore escaped <br> tags
+    html = html.replace(/&lt;br&gt;/gi, '<br>');
 
     // 2. Parse Markdown Tables
     const lines = html.split('\n');
