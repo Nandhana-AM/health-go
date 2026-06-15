@@ -467,8 +467,8 @@
   transform: translate(1px, -0.5px);
 }
 
-/* Markdown Tables & Formatting Support */
-.table-responsive {
+/* Markdown Tables & Formatting Support (using ::ng-deep for dynamic HTML inside [innerHTML]) */
+::ng-deep .table-responsive {
   width: 100%;
   overflow-x: auto;
   margin: 10px 0;
@@ -478,7 +478,7 @@
   box-shadow: var(--shadow-subtle);
 }
 
-.chat-table {
+::ng-deep .chat-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
@@ -487,7 +487,7 @@
   min-width: 320px;
 }
 
-.chat-table th {
+::ng-deep .chat-table th {
   background: var(--forest-green);
   color: #ffffff;
   font-weight: 600;
@@ -496,30 +496,32 @@
   font-family: var(--font-heading);
 }
 
-.chat-table td {
+::ng-deep .chat-table td {
   padding: 0.6rem 0.8rem;
   border-bottom: 1px solid var(--border-color);
   vertical-align: top;
-  line-height: 1.4;
+  line-height: 1.45;
+  word-break: normal !important;
 }
 
-.chat-table tr:last-child td {
+::ng-deep .chat-table tr:last-child td {
   border-bottom: none;
 }
 
-.chat-table tr:nth-child(even) {
+::ng-deep .chat-table tr:nth-child(even) {
   background: #fdfdfb;
 }
 
-.bullet-item {
+::ng-deep .bullet-item {
   display: block;
   margin-left: 0.25rem;
   font-size: 0.82rem;
   color: var(--dark-charcoal);
   line-height: 1.45;
+  margin-bottom: 4px;
 }
 
-.message-bubble strong {
+::ng-deep .message-bubble strong {
   font-weight: 700;
   color: inherit;
 }
@@ -552,31 +554,33 @@
 }
 
 /* Force message bubble to utilize full width if it contains a table */
-.message-bubble:has(.table-responsive) {
+::ng-deep .message-bubble:has(.table-responsive) {
   width: 100%;
   max-width: 100%;
 }
 
-.msg-content-col:has(.table-responsive) {
+::ng-deep .msg-content-col:has(.table-responsive) {
   max-width: 100%;
 }
 
 /* Table column sizing and text wrap rules */
-.chat-table th:nth-child(1),
-.chat-table td:nth-child(1) {
-  width: 35%;
+::ng-deep .chat-table th:nth-child(1),
+::ng-deep .chat-table td:nth-child(1) {
+  width: 30%;
   font-weight: 600;
 }
 
-.chat-table th:nth-child(2),
-.chat-table td:nth-child(2) {
-  width: 20%;
+::ng-deep .chat-table th:nth-child(2),
+::ng-deep .chat-table td:nth-child(2) {
+  width: 25%;
   white-space: nowrap;
+  word-break: normal !important;
 }
 
-.chat-table th:nth-child(3),
-.chat-table td:nth-child(3) {
+::ng-deep .chat-table th:nth-child(3),
+::ng-deep .chat-table td:nth-child(3) {
   width: 45%;
 }
+
 
 
