@@ -154,15 +154,42 @@ export class ChatbotComponent {
     // 1b. Restore escaped <br> tags
     html = html.replace(/&lt;br&gt;/gi, '<br>');
 
-    // 2. Parse Markdown Tables
-    const lines = html.split('\n');
+    // 2. Pre-process lines to merge multi-line table rows
+    const rawLines = html.split('\n');
+    const lines: string[] = [];
+    
+    for (let i = 0; i < rawLines.length; i++) {
+      const trimmedLine = rawLines[i].trim();
+      
+      // Check if line starts with | but doesn't end with | (optionally followed by punctuation)
+      if (trimmedLine.startsWith('|') && !/\s*\|\s*[.,;]?\s*$/.test(trimmedLine)) {
+        let merged = rawLines[i];
+        let j = i + 1;
+        while (j < rawLines.length) {
+          const nextLine = rawLines[j].trim();
+          merged += '<br>' + rawLines[j];
+          if (/\s*\|\s*[.,;]?\s*$/.test(nextLine)) {
+            i = j;
+            break;
+          }
+          j++;
+        }
+        lines.push(merged);
+      } else {
+        lines.push(rawLines[i]);
+      }
+    }
+
+    // 3. Parse Markdown Tables
     let inTable = false;
     let tableHtml = '';
     const outputLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      if (line.startsWith('|') && line.endsWith('|')) {
+      const isTableRow = line.startsWith('|') && /\s*\|\s*[.,;]?\s*$/.test(line);
+
+      if (isTableRow) {
         // Skip separator line (e.g. |---|---|)
         if (line.includes('---') || line.includes('===') || line.replace(/[|\s-]/g, '') === '') {
           if (!inTable) {
