@@ -1,0 +1,105 @@
+<div class="cart-backdrop" [class.backdrop-show]="isOpen" (click)="close.emit()">
+  <div class="cart-panel" [class.panel-open]="isOpen" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="cart-header">
+      <h2 class="drawer-title">
+        Shopping Cart 
+        <span class="items-count-badge" *ngIf="totalItems() > 0">{{ totalItems() }}</span>
+      </h2>
+      <button class="drawer-close-btn" (click)="close.emit()" aria-label="Close Cart">
+        <svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Items List -->
+    <div class="cart-body" *ngIf="totalItems() > 0; else emptyCart">
+      <!-- Shipping Progress Bar -->
+      <div class="shipping-banner">
+        <div class="shipping-info">
+          <span class="shipping-icon" *ngIf="totalPrice() >= 500">🎉</span>
+          <span class="shipping-text" *ngIf="totalPrice() >= 500">You've unlocked <strong>FREE Shipping!</strong></span>
+          <span class="shipping-text" *ngIf="totalPrice() < 500">
+            Add <strong>{{ (500 - totalPrice()) | currency:'INR':'symbol-narrow':'1.0-0' }}</strong> more for <strong>FREE Shipping</strong>
+          </span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" [style.width.%]="(totalPrice() / 500) * 100 > 100 ? 100 : (totalPrice() / 500) * 100"></div>
+        </div>
+      </div>
+
+      <!-- Scrollable List -->
+      <div class="cart-items-scroll">
+        <div *ngFor="let item of cartItems()" class="cart-item-card">
+          <!-- Item Visual -->
+          <div class="item-visual-thumb" [style.background]="item.product.colorTheme">
+            <span class="thumb-emoji">{{ item.product.emoji }}</span>
+          </div>
+
+          <!-- Item Details -->
+          <div class="item-details">
+            <div class="item-header">
+              <h4 class="item-title">{{ item.product.name }}</h4>
+              <button class="item-delete-btn" (click)="removeItem(item.product.id)" aria-label="Remove Item">
+                <svg class="delete-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <span class="item-qty-tag">{{ item.product.quantity }}</span>
+
+            <div class="item-footer">
+              <!-- Sub-Quantity Adjuster -->
+              <div class="qty-adjuster">
+                <button class="adjust-btn" (click)="decrementItem(item.product.id, item.quantity)" aria-label="Decrease quantity">-</button>
+                <span class="adjust-num">{{ item.quantity }}</span>
+                <button class="adjust-btn" (click)="incrementItem(item.product.id, item.quantity)" aria-label="Increase quantity">+</button>
+              </div>
+              <span class="item-total-price">{{ item.product.price * item.quantity | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <ng-template #emptyCart>
+      <div class="empty-state-container">
+        <svg class="empty-cart-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <h3>Your Cart is Empty</h3>
+        <p>Looks like you haven't added any organic goodies yet. Start browsing our farm-fresh products!</p>
+        <button class="btn-primary" (click)="close.emit()">Shop Products</button>
+      </div>
+    </ng-template>
+
+    <!-- Footer Summary (when items exist) -->
+    <div class="cart-footer" *ngIf="totalItems() > 0">
+      <div class="summary-row">
+        <span class="summary-label">Estimated Delivery</span>
+        <span class="summary-value" *ngIf="totalPrice() >= 500">FREE</span>
+        <span class="summary-value" *ngIf="totalPrice() < 500">{{ 50 | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+      </div>
+      <div class="summary-row subtotal-row">
+        <span class="summary-label">Subtotal</span>
+        <span class="summary-value">{{ totalPrice() | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+      </div>
+
+      <button class="btn-primary checkout-btn" [disabled]="isCheckingOut()" (click)="checkout()">
+        <!-- Spinner SVG -->
+        <svg *ngIf="isCheckingOut()" class="spinner-svg" viewBox="0 0 24 24" fill="none">
+          <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle>
+          <path class="spinner-head" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor"></path>
+        </svg>
+        <span>{{ isCheckingOut() ? 'Processing Order...' : 'Proceed to Checkout' }}</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<div class="drawer-overlay" [class.overlay-open]="isOpen" (click)="close.emit()">
+  <div class="orders-drawer glass-panel" [class.drawer-open]="isOpen" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="drawer-header">
+      <div class="header-title-row">
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <h2>Order Vault</h2>
+      </div>
+      <button class="close-btn" (click)="close.emit()" aria-label="Close orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body Content -->
+    <div class="drawer-body">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading()" class="loading-state">
+        <div class="spinner"></div>
+        <p>Retrieving your order archives...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorMessage() && !isLoading()" class="error-alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p>{{ errorMessage() }}</p>
+        <button class="btn-primary" (click)="loadOrders()">Retry</button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="orders().length === 0 && !isLoading() && !errorMessage()" class="empty-state">
+        <div class="empty-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+        <h3>No Orders Found</h3>
+        <p>You haven't checked out any organic baskets yet. Start shopping to fill your vault!</p>
+        <button class="btn-primary" (click)="close.emit()">Browse Products</button>
+      </div>
+
+      <!-- Orders List -->
+      <div *ngIf="orders().length > 0 && !isLoading()" class="orders-list">
+        <div 
+          *ngFor="let order of orders(); trackBy: trackByOrderId" 
+          class="order-card glass-panel"
+          [class.card-expanded]="isExpanded(order.id)"
+        >
+          <!-- Order Summary Header -->
+          <div class="order-card-header" (click)="toggleExpand(order.id)">
+            <div class="order-meta">
+              <span class="order-id">Order #{{ order.id }}</span>
+              <span class="order-date">{{ order.created_at | date:'mediumDate' }}</span>
+            </div>
+            <div class="order-summary-right">
+              <span class="order-price">{{ order.total_price | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+              <span class="order-status-badge completed">Completed</span>
+              <svg class="chevron-icon" [class.chevron-rotated]="isExpanded(order.id)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Expanded Details Section -->
+          <div class="order-card-details" *ngIf="isExpanded(order.id)">
+            <div class="items-list">
+              <div *ngFor="let item of order.items" class="order-item-row">
+                <div class="item-info">
+                  <span class="item-emoji">{{ item.product?.emoji || '🌾' }}</span>
+                  <div class="item-text">
+                    <span class="item-name">{{ item.product?.name || 'Organic Item' }}</span>
+                    <span class="item-desc">{{ item.product?.quantity_description || '1 unit' }} × {{ item.quantity }}</span>
+                  </div>
+                </div>
+                <span class="item-price">
+                  {{ (item.price_at_purchase * item.quantity) | currency:'INR':'symbol-narrow':'1.0-0' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Cost Summary Breakdown -->
+            <div class="cost-breakdown">
+              <div class="breakdown-row">
+                <span>Subtotal</span>
+                <span>{{ (order.total_price - order.delivery_fee) | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row">
+                <span>Delivery Charge</span>
+                <span>{{ order.delivery_fee | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row total-row">
+                <span>Grand Total</span>
+                <span>{{ order.total_price | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

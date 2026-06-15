@@ -1,0 +1,306 @@
+.navbar-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition-smooth);
+}
+
+.navbar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0.8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0.8rem 1.2rem;
+  }
+}
+
+/* Brand Logo Styling */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--forest-green);
+  letter-spacing: -0.02em;
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--mint-light);
+  transform: rotate(-10deg);
+  transition: var(--transition-bounce);
+}
+
+.brand-logo:hover .logo-icon {
+  transform: rotate(15deg) scale(1.1);
+  color: var(--mint-green);
+}
+
+.accent-text {
+  color: var(--mint-light);
+}
+
+/* Navigation Menu */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+}
+
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none; /* In a real production app we'd build a hamburger menu, but for a clean single scroll page we can prioritize screen space or stack them */
+  }
+}
+
+.nav-link {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--forest-green);
+  font-size: 0.95rem;
+  position: relative;
+  padding: 0.3rem 0;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--mint-light);
+  transition: var(--transition-smooth);
+}
+
+.nav-link:hover {
+  color: var(--mint-light);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Cart Button & Badge */
+.cart-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: rgba(27, 67, 50, 0.04);
+  color: var(--forest-green);
+  position: relative;
+  transition: var(--transition-bounce);
+}
+
+.cart-toggle-btn:hover {
+  background: var(--forest-green);
+  color: var(--cream-bg);
+  transform: scale(1.08);
+}
+
+.cart-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--mint-light);
+  color: var(--forest-green);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.75rem;
+  min-width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 6px rgba(82, 183, 136, 0.4);
+  animation: badgePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0.4); }
+  80% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* User Menu & Authentication Styles */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-menu-wrapper {
+  position: relative;
+}
+
+.user-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: rgba(82, 183, 136, 0.1);
+  border: 1px solid rgba(82, 183, 136, 0.2);
+  cursor: pointer;
+  transition: var(--transition-bounce);
+  padding: 0;
+}
+
+.user-menu-btn:hover {
+  transform: scale(1.05);
+  background: rgba(82, 183, 136, 0.2);
+  box-shadow: 0 0 10px rgba(82, 183, 136, 0.2);
+}
+
+.user-avatar {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--forest-green);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 220px;
+  padding: 0.6rem;
+  border-radius: var(--radius-lg);
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  transform-origin: top right;
+  animation: dropdownFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: scale(0.92) translateY(-8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.user-dropdown-header {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.4rem;
+}
+
+.user-email {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-md);
+  color: var(--text-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  border: none;
+}
+
+.dropdown-item-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--forest-green);
+}
+
+.dropdown-item:hover {
+  background: rgba(82, 183, 136, 0.1);
+  color: var(--forest-green);
+}
+
+.logout-btn {
+  color: #d00000;
+}
+
+.logout-btn .dropdown-item-icon {
+  color: #d00000;
+}
+
+.logout-btn:hover {
+  background: rgba(208, 0, 0, 0.08);
+  color: #d00000;
+}
+
+/* Sign In Action button */
+.btn-signin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: 1.5px solid var(--forest-green);
+  color: var(--forest-green);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-bounce);
+}
+
+.signin-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-signin:hover {
+  background: var(--forest-green);
+  color: var(--cream-bg);
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.25);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 576px) {
+  .signin-text {
+    display: none; /* Hide text on small screens, show icon only */
+  }
+  .btn-signin {
+    padding: 0.5rem;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+}
+

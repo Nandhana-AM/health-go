@@ -1,0 +1,124 @@
+<!-- Floating Chat Trigger Button -->
+<button class="chat-trigger-btn" [class.trigger-active]="isOpen()" (click)="toggleChat()" aria-label="Toggle wellness assistant">
+  <!-- Closed Icon (Message bubbles) -->
+  <svg *ngIf="!isOpen()" class="trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+  
+  <!-- Open Icon (X mark) -->
+  <svg *ngIf="isOpen()" class="trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+  
+  <!-- Online Dot indicator -->
+  <span *ngIf="!isOpen()" class="notification-dot"></span>
+</button>
+
+<!-- Chat Window Window Dialog -->
+<div class="chat-window-panel glass-panel" [class.window-show]="isOpen()">
+  <!-- Window Header -->
+  <div class="chat-header">
+    <div class="bot-profile">
+      <div class="bot-avatar-circle">
+        <svg class="bot-avatar-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+      <div class="bot-status-meta">
+        <h3>Go-Bot</h3>
+        <span class="status-online"><span class="online-indicator-dot"></span>Online Assistant</span>
+      </div>
+    </div>
+    <button class="header-close-btn" (click)="toggleChat()" aria-label="Minimize Chat">
+      <svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Messages scroll log -->
+  <div class="chat-body-scroll" #chatScrollContainer>
+    <div class="messages-log">
+      <div *ngFor="let msg of messages()" class="message-wrapper" [class.wrapper-user]="msg.sender === 'user'">
+        <!-- Avatar for bot -->
+        <div *ngIf="msg.sender === 'bot'" class="msg-avatar">🌱</div>
+        
+        <!-- Vertical Column for Bubble + Card -->
+        <div class="msg-content-col">
+          <!-- Text Bubble -->
+          <div class="message-bubble" [class.bubble-user]="msg.sender === 'user'">
+            <p class="msg-text" [innerHTML]="formatMessage(msg.text)"></p>
+            <span class="msg-timestamp">{{ msg.timestamp | date:'shortTime' }}</span>
+          </div>
+
+          <!-- Inline Product Card Attachment (Dynamic details) -->
+          <div *ngIf="msg.matchedProduct" class="bot-product-card glass-panel">
+            <div class="card-visual-header" [style.background]="msg.matchedProduct.colorTheme">
+              <span class="bot-card-emoji">{{ msg.matchedProduct.emoji }}</span>
+              <span class="bot-card-category">{{ msg.matchedProduct.category }}</span>
+            </div>
+            <div class="card-body-details">
+              <h4>{{ msg.matchedProduct.name }}</h4>
+              <span class="card-qty-tag">{{ msg.matchedProduct.quantity }}</span>
+              <div class="card-action-row">
+                <span class="card-price-value">{{ msg.matchedProduct.price | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+                <button class="btn-bot-add" (click)="addToCart(msg.matchedProduct)">
+                  <span>Add to Cart</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div *ngIf="isTyping()" class="message-wrapper">
+        <div class="msg-avatar">🌱</div>
+        <div class="message-bubble bubble-typing">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggested Options Panel -->
+  <div class="suggestions-wrapper" *ngIf="!isTyping() && messages()[messages().length - 1]?.suggestions as suggestions">
+    <div class="suggestions-container">
+      <button 
+        *ngFor="let suggestion of suggestions" 
+        (click)="clickSuggestion(suggestion)" 
+        class="suggestion-chip"
+      >
+        {{ suggestion }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Input Area Footer -->
+  <div class="chat-footer-input">
+    <input 
+      type="text" 
+      placeholder="Ask about Karupatti, Garlic, Coffee..." 
+      [ngModel]="userMessage()"
+      (ngModelChange)="userMessage.set($event)"
+      (keydown.enter)="sendMessage(userMessage())"
+      class="chat-input-field"
+      [disabled]="isTyping()"
+    />
+    <button 
+      class="chat-send-btn" 
+      (click)="sendMessage(userMessage())" 
+      [disabled]="!userMessage().trim() || isTyping()"
+      aria-label="Send message"
+    >
+      <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<section class="shop-section" id="shop">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="shop-header animate-slide-up">
+      <span class="sub-header">Fresh From Local Farms</span>
+      <h2 class="shop-title">Our Organic Harvest</h2>
+      <p class="shop-desc">
+        Explore organic vegetables, cold-pressed beverages, superfoods, and grain seeds. Click on any product to view its natural ingredients and health benefits.
+      </p>
+    </div>
+
+    <!-- Filter Control Bar -->
+    <div class="filter-panel glass-panel animate-slide-up">
+      <!-- Search Input -->
+      <div class="filter-group search-group">
+        <label for="search" class="filter-label">Search products</label>
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            id="search"
+            type="text" 
+            placeholder="Search spinach, almonds..." 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="searchQuery.set($event)"
+            class="search-input"
+          />
+        </div>
+      </div>
+
+      <!-- Price Range Slider -->
+      <div class="filter-group price-group">
+        <div class="price-label-row">
+          <label for="price-range" class="filter-label">Max Price</label>
+          <span class="price-value">{{ maxPrice() | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <input 
+          id="price-range"
+          type="range" 
+          [min]="0" 
+          [max]="maxPriceLimit()" 
+          step="0.5"
+          [ngModel]="maxPrice()" 
+          (ngModelChange)="maxPrice.set($event)"
+          class="price-range-slider"
+        />
+      </div>
+    </div>
+
+    <!-- Category Selector Ribbon -->
+    <div class="category-ribbon animate-slide-up">
+      <button 
+        *ngFor="let cat of categories" 
+        class="category-chip" 
+        [class.chip-active]="selectedCategory() === cat"
+        (click)="selectCategory(cat)"
+      >
+        {{ cat }}
+      </button>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid animate-slide-up" *ngIf="filteredProducts().length > 0; else noProducts">
+      <app-product-card 
+        *ngFor="let prod of filteredProducts()" 
+        [product]="prod"
+        (viewDetails)="openDetails($event)"
+        (addToCart)="addProductToCart($event)"
+      ></app-product-card>
+    </div>
+
+    <!-- Empty Search Results State -->
+    <ng-template #noProducts>
+      <div class="no-results-card glass-panel animate-slide-up">
+        <svg class="no-results-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+        <h3>No Organic Matches</h3>
+        <p>We couldn't find any products fitting your exact search or price parameters. Try clearing your filters.</p>
+        <button class="btn-primary" (click)="resetFilters()">Reset All Filters</button>
+      </div>
+    </ng-template>
+  </div>
+</section>
+
+<!-- Detail Modal Popup -->
+<app-product-detail-modal 
+  [product]="selectedProduct()"
+  (close)="closeDetails()"
+  (addToCart)="addMultipleToCart($event)"
+></app-product-detail-modal>

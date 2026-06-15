@@ -1,1 +1,249 @@
-/* You can add global styles to this file, and also import other style files */
+/* Core Theme Variables & Design Tokens */
+:root {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Premium Organic Color Palette */
+  --forest-green: #1b4332;
+  --forest-green-rgb: 27, 67, 50;
+  --mint-green: #40916c;
+  --mint-light: #52b788;
+  --sage-light: #d8f3dc;
+  --cream-bg: #fdfcf9;
+  --card-white: #ffffff;
+  --sand-accent: #d4a373;
+  --gold-accent: #e9c46a;
+  --dark-charcoal: #1e2229;
+  --text-muted: #5e6b7c;
+  --border-color: rgba(27, 67, 50, 0.08);
+
+  /* Shadows and Glassmorphism */
+  --shadow-subtle: 0 2px 10px rgba(27, 67, 50, 0.03);
+  --shadow-medium: 0 10px 30px rgba(27, 67, 50, 0.06);
+  --shadow-large: 0 20px 45px rgba(27, 67, 50, 0.12);
+  --glass-bg: rgba(253, 252, 249, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Reset and Core Layouts */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--cream-bg);
+  color: var(--dark-charcoal);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--forest-green);
+  line-height: 1.25;
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--mint-green);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--forest-green);
+}
+
+/* Button & Link Foundations */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  outline: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Common Layout Utilities */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.2rem;
+  }
+}
+
+/* Elegant Backdrop/Glass Overlay */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Primary Premium Button */
+.btn-primary {
+  background: var(--forest-green);
+  color: var(--cream-bg);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition-bounce);
+  box-shadow: 0 4px 15px rgba(27, 67, 50, 0.2);
+}
+
+.btn-primary:hover {
+  background: var(--mint-green);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(64, 145, 108, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(-1px);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background: transparent;
+  color: var(--forest-green);
+  border: 1.5px solid var(--forest-green);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition-bounce);
+}
+
+.btn-secondary:hover {
+  background: rgba(27, 67, 50, 0.05);
+  transform: translateY(-2px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* Badge Styling */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-green {
+  background-color: var(--sage-light);
+  color: var(--forest-green);
+}
+
+.badge-gold {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes toastSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}

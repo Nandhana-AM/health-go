@@ -1,0 +1,96 @@
+<section class="hero-section" id="home">
+  <!-- Decorative Background Blobs -->
+  <div class="blob-accent blob-1"></div>
+  <div class="blob-accent blob-2"></div>
+
+  <div class="container hero-container">
+    <!-- Hero Copywriting -->
+    <div class="hero-content">
+      <div class="hero-badge-row">
+        <span class="badge badge-green">🌿 100% Certified Organic</span>
+        <span class="badge badge-gold">✨ Freshly Handpicked</span>
+      </div>
+      
+      <h1 class="hero-title">
+        Nourish Your Body With <span class="accent-gradient">Pure Nature</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        Handpicked, cold-pressed, and nutrient-rich organic products delivered fresh to your door. We map the exact ingredients and benefits of every product so you know exactly what fuels you.
+      </p>
+
+      <div class="hero-cta-buttons">
+        <button class="btn-primary" (click)="scrollToShop()">
+          <span>Explore Products</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+        <button class="btn-secondary" (click)="scrollToShop()">
+          <span>View Ingredients</span>
+        </button>
+      </div>
+
+      <!-- Micro Trust Indicators -->
+      <div class="hero-trust-indicators">
+        <div class="trust-item">
+          <strong>No Additives</strong>
+          <span>100% Raw Produce</span>
+        </div>
+        <div class="trust-divider"></div>
+        <div class="trust-item">
+          <strong>Eco-friendly</strong>
+          <span>Sustainable Sourcing</span>
+        </div>
+        <div class="trust-divider"></div>
+        <div class="trust-item">
+          <strong>Fast Delivery</strong>
+          <span>Zero-waste Packing</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Interactive Graphic -->
+    <div class="hero-graphic-container">
+      <div class="circle-backdrop">
+        <!-- Floating organic elements -->
+        <div class="floating-item item-1 glass-panel">
+          <span class="item-emoji">🥑</span>
+          <div>
+            <h4>Hass Avocado</h4>
+            <span class="item-stat">Healthy Fats</span>
+          </div>
+        </div>
+
+        <div class="floating-item item-2 glass-panel">
+          <span class="item-emoji">🍓</span>
+          <div>
+            <h4>Strawberries</h4>
+            <span class="item-stat">Vitamin C</span>
+          </div>
+        </div>
+
+        <div class="floating-item item-3 glass-panel">
+          <span class="item-emoji">🍵</span>
+          <div>
+            <h4>Matcha Green</h4>
+            <span class="item-stat">Antioxidants</span>
+          </div>
+        </div>
+
+        <!-- Main Visual Centerpiece -->
+        <div class="center-bowl">
+          <svg class="bowl-art" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Leaf outline -->
+            <path d="M100 20C50 20 20 50 20 100c0 40 25 75 60 90 20-30 40-70 20-110 30 20 60 60 20 110 35-15 60-50 60-90 0-50-30-80-80-80z" fill="rgba(64, 145, 108, 0.15)"/>
+            <path d="M100 20c15 35 45 60 45 80s-15 35-45 40c-30-5-45-20-45-40s30-45 45-80z" fill="var(--mint-light)" fill-opacity="0.4"/>
+            <!-- Concentric rings -->
+            <circle cx="100" cy="100" r="70" stroke="var(--forest-green)" stroke-width="1.5" stroke-dasharray="6 6"/>
+            <circle cx="100" cy="100" r="85" stroke="var(--mint-light)" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
