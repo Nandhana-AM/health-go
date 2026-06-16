@@ -59,96 +59,121 @@ graph TD
 
 ---
 
-## Component Diagram
+## Core Pipeline Flows
 
-The following diagram details the interactions between the modular components of both the frontend client and backend service layers.
+### 1. User Authentication Pipeline
+This flow secures customer sessions and order history through JSON Web Tokens (JWT).
 
 ```mermaid
-graph TB
-    subgraph FrontendComponents [Angular Frontend Components]
-        Root[App Component]
-        Nav[Navbar Component]
-        Hero[Hero Component]
-        ProdList[Product List Component]
-        ProdCard[Product Card Component]
-        Cart[Cart Drawer Component]
-        Chat[Chatbot Component]
-        Auth[Auth Modal Component]
-        Orders[Order History Component]
+sequenceDiagram
+    autonumber
+    actor User as Customer
+    participant FE as Angular Client
+    participant BE as FastAPI Server
+    participant DB as PostgreSQL
+    
+    User->>FE: Enters Email & Password
+    FE->>BE: POST /api/auth/login
+    BE->>DB: Query User by Email
+    DB-->>BE: User Record (Hashed Password)
+    BE->>BE: Verify Password (Bcrypt Context)
+    
+    alt Credentials Valid
+        BE->>BE: Generate JWT Token (Sub: Email, Exp: 24h)
+        BE-->>FE: Return Token (access_token, token_type)
+        FE->>FE: Save Token to LocalStorage (health_go_token)
+        FE->>FE: Update currentUser Signal
+    else Credentials Invalid
+        BE-->>FE: 401 Unauthorized (Error Message)
+        FE->>User: Display Toast Alert
     end
-
-    subgraph FrontendServices [Angular Services]
-        S_Api[ApiService]
-        S_Prod[ProductService]
-        S_Cart[CartService]
-        S_Chat[ChatbotService]
-    end
-
-    subgraph BackendModules [FastAPI Backend]
-        B_Main[main.py - Endpoints & Routing]
-        B_Auth[auth.py - JWT & Password Hash]
-        B_DB[database.py - SQLAlchemy Session]
-        B_Models[models.py - SQLAlchemy Entities]
-        B_Schemas[schemas.py - Pydantic Validation]
-        B_Config[config.py - Env Settings]
-    end
-
-    subgraph DatabaseLayer [PostgreSQL Database]
-        T_Users[users table]
-        T_Products[products table]
-        T_Orders[orders table]
-        T_Items[order_items table]
-    end
-
-    %% Component relationships
-    Root --> Nav
-    Root --> Hero
-    Root --> ProdList
-    Root --> Cart
-    Root --> Chat
-    Root --> Auth
-    Root --> Orders
-    ProdList --> ProdCard
-
-    %% Component to service relationships
-    Nav & Auth & Orders --> S_Api
-    ProdList --> S_Prod
-    ProdCard & Cart --> S_Cart
-    Chat --> S_Chat
-
-    %% Service to API relationships
-    S_Prod & S_Cart & S_Chat & S_Api --> S_Api
-    S_Api --> |HTTP JSON| B_Main
-
-    %% Backend internal relationships
-    B_Main --> B_Auth
-    B_Main --> B_Schemas
-    B_Main --> B_DB
-    B_DB --> B_Models
-    B_Models --> B_Config
-
-    %% DB relationships
-    B_Models --> T_Users
-    B_Models --> T_Products
-    B_Models --> T_Orders
-    B_Models --> T_Items
 ```
 
-### Key Frontend Components & Services:
-*   **App Component**: Orchestrates the overlay modals and coordinates top-level layouts.
-*   **Navbar Component**: Manages application access status, links, and triggers.
-*   **Product List & Card Components**: Present product catalog items and allow additions to the shopping cart.
-*   **Cart Drawer Component**: Manages item selections, computes delivery fees, and submits purchase transactions.
-*   **Chatbot Component**: Hosts the wellness assistant chat container.
-*   **ApiService**: The central communication channel for HTTP operations. Maintains the current user token session.
-*   **ProductService & CartService**: Maintain catalog caches and reactive shopping states using Angular Signals.
-*   **ChatbotService**: Processes conversations by querying the server-side LLM backend or executing client-side fallback rule parsing.
+*   **Password Hashing**: Implemented using `passlib[bcrypt]` to secure passwords prior to database insertion.
+*   **Session Persistence**: The frontend checks local storage during initialization, requests the `/api/auth/me` endpoint to validate, and re-populates state signals.
 
-### Key Backend Components:
-*   **main.py**: Initiates the FastAPI server instance, configures CORS rules, and serves route operations.
-*   **auth.py**: Manages password cryptography using Bcrypt and web token operations.
-*   **database.py**: Establishes SQLAlchemy connection pools and session management.
-*   **models.py & schemas.py**: Define PostgreSQL table relations and handle Pydantic schema validation.
+---
+
+### 2. Concurrent-Safe Transactional Checkout Flow
+To prevent race conditions where multiple users buy the last item simultaneously, the backend utilizes database-level row locking.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Customer
+    participant FE as Angular Cart Drawer
+    participant BE as FastAPI Server
+    participant DB as PostgreSQL (Transaction)
+    
+    User->>FE: Clicks Checkout
+    FE->>BE: POST /api/orders (Authorization: Bearer JWT)
+    Note over BE: Starts DB Transaction
+    
+    loop For Each Item in Order
+        BE->>DB: SELECT with_for_update() FROM products WHERE id = ?
+        Note over DB: Locks row for modification
+        DB-->>BE: Product Stock Quantity
+        
+        alt Quantity Available >= Requested
+            BE->>DB: UPDATE stock_quantity = stock_quantity - requested
+            BE->>BE: Calculate Subtotal Costs
+        else Insufficient Stock
+            BE->>DB: Rollback Transaction
+            BE-->>FE: 400 Bad Request ("Insufficient stock for...")
+            Note over FE: Displays warning toast
+        end
+    end
+    
+    BE->>DB: INSERT INTO orders & order_items
+    BE->>DB: Commit Transaction
+    DB-->>BE: Confirm Commit
+    BE-->>FE: 201 Created (Order Receipt)
+    FE->>FE: Clear Cart Signal & Reload Catalog
+```
+
+*   **Row-Level Locking (`with_for_update()`)**: Lock-selects row updates in PostgreSQL, forcing concurrent threads attempting to check out the same product to queue sequentially, preventing negative stock levels.
+*   **Automatic Delivery Calculation**: If order subtotal is `< Rs 500`, a flat `Rs 50` delivery fee is appended. For orders `>= Rs 500`, the delivery fee is set to `Rs 0` (FREE).
+
+---
+
+### 3. AI Chatbot ("Go-Bot") Wellness Assistant Flow
+Go-Bot acts as a conversational assistant. It knows the current stock levels, product benefits, and ingredient lists.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Customer
+    participant FE as Chatbot Widget
+    participant BE as FastAPI Server
+    participant DB as PostgreSQL
+    participant AI as Groq API Cloud
+    
+    User->>FE: Types "What are the benefits of Karupatti?"
+    FE->>BE: POST /api/chatbot (Body: message)
+    BE->>DB: SELECT * FROM products
+    DB-->>BE: List of Products & Metadata
+    BE->>BE: Check for GROQ_API_KEY in Environment
+    
+    alt GROQ_API_KEY Available (Online AI Mode)
+        BE->>BE: Compile Product Context & System Prompts
+        BE->>AI: Send Prompt to llama-3.3-70b-versatile (JSON Mode)
+        AI-->>BE: JSON Response (text, matched_product_id, suggestions)
+        BE-->>FE: Return ChatbotResponse Schema
+    else GROQ_API_KEY Missing (Offline Mode Fallback)
+        BE->>BE: Apply Local Regex / Rule-based string parsing
+        BE-->>FE: Return local matching response + fallback advice
+    end
+    
+    FE->>FE: Render Markdown Response
+    alt matched_product_id is Present
+        FE->>FE: Render Interactive Mini Product Card in chat history
+    end
+    FE->>User: Display Message & Suggestion Chips
+```
+
+*   **Dynamic Context Injection**: The backend serializes all catalog items (ID, category, price, ingredients, benefits, stock status) into a JSON context block and feeds it inside the system prompt to the LLM.
+*   **Response Formatting**: The LLM is directed to format comparisons or multiple products inside a markdown table (`| Product | Price | Benefits |`) and output suggestions.
+*   **Client-Side Resiliency**: If the entire backend is offline, the Angular `ChatbotService` catches the error and executes its own client-side parsing pipeline to serve recommendations without interrupting the user experience.
 
 ---
 
